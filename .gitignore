@@ -1,31 +1,22 @@
-backend/venv/
-backend/.venv/
-backend/env/
-backend/ENV/
+# Ambiente Virtual
+venv/
+.venv/
+env/
 
+# Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 
-backend/.env
-backend/.env.*
-!backend/.env.example
+# Variáveis e Banco
+.env
+.env.*
+!.env.example
+db.sqlite3
+*.sqlite3
 
+# Mídia e VS Code
+media/
 .vscode/
-.idea/
 
-# Sistema
-.DS_Store
-Thumbs.db
-
-backend/media/
-backend/staticfiles/
-backend/collectstatic/
-
-backend/db.sqlite3
-backend/*.sqlite3
-backend/*.sqlite3-journal
-
+# Logs
 *.log
-backend/logs/
