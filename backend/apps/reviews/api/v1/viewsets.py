@@ -18,6 +18,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    from rest_framework.exceptions import ValidationError
+
     def perform_create(self, serializer):
         if self.request.user.role != self.request.user.Role.CLIENT:
             raise ValidationError("Apenas clientes podem criar avaliações.")
