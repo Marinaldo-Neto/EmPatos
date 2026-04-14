@@ -40,15 +40,26 @@ class ProviderProfileViewSet(viewsets.ModelViewSet):
             raise ValidationError("Este usuário já possui perfil de prestador.")
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=["get", "put", "patch"], permission_classes=[IsAuthenticated])
     def me(self, request):
         if request.user.role != request.user.Role.PROVIDER:
             raise ValidationError("Apenas prestadores possuem perfil profissional.")
 
         if not hasattr(request.user, "provider_info"):
             raise NotFound("Perfil profissional não encontrado.")
+        
+        profile = request.user.provider_info
 
-        serializer = ProviderProfileReadSerializer(request.user.provider_info)
+        if request.method == "GET":
+            serializer = ProviderProfileReadSerializer(request.user.provider_info)
+            return Response(serializer.data)
+        
+        partial = request.method == "PATCH"
+        serializer = ProviderProfileWriteSerializer(profile, data=request.data, partial=partial)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data)
 
 

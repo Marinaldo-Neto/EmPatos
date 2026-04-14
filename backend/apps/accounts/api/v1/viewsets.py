@@ -61,11 +61,20 @@ class ClientProfileViewSet(viewsets.ModelViewSet):
 
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=["get", "put", "patch"], permission_classes=[IsAuthenticated])
     def me(self, request):
         profile = ClientProfile.objects.filter(user=request.user).first()
         if not profile:
             return Response({"detail": "Perfil de cliente não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        
+        if request.method == "GET":
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+        
+        partial = request.method == "PATCH"
+        serializer = self.get_serializer(profile, data=request.data, partial=partial)
 
-        serializer = self.get_serializer(profile)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data)
