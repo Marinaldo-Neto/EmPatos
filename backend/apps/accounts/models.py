@@ -6,8 +6,7 @@ from django.conf import settings
 from apps.shared.models import BaseModel
 
 from .managers import UserManager
-class User(AbstractUser):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class User(AbstractUser, BaseModel):
     class Role(models.TextChoices):
         PROVIDER = "PROVIDER", "Prestador"
         CLIENT = "CLIENT", "Cliente"
@@ -40,6 +39,13 @@ class ClientProfile(BaseModel):
         "providers.ProviderProfile",
         blank=True,
         related_name="favorited_by",
+    )
+
+    phone_number = models.CharField(
+        max_length=20, 
+        blank=True,
+        default = "",
+        verbose_name="WhatsApp/Telefone"
     )
 
     def __str__(self):

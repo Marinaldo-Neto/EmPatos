@@ -12,10 +12,15 @@ class Category(BaseModel):
 class ProviderProfile(BaseModel):
 
     bio = models.TextField(
-        max_length=500,
+        max_length=200,
         blank=True,
-        help_text="Conte sua história (max 500 caracteres)."
+        help_text="Conte sua história (max 200 caracteres)."
         )
+    
+    description = models.TextField(
+        blank=True,
+        help_text="Conte sobre seus serviços."
+    )
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 

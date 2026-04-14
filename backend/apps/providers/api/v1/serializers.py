@@ -31,6 +31,7 @@ class ProviderProfileReadSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "bio",
+            "description",
             "is_available",
             "user",
             "categories",
@@ -49,5 +50,5 @@ class ProviderProfileWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProviderProfile
-        fields = ["id", "bio", "is_available", "categories"]
+        fields = ["id", "bio", "description", "is_available", "categories"]
         read_only_fields = ["id"]

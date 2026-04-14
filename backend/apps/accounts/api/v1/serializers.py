@@ -53,5 +53,5 @@ class ClientProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientProfile
-        fields = ["id", "user", "favorites"]
+        fields = ["id", "user", "favorites", "phone_number"]
         read_only_fields = ["id", "user"]
