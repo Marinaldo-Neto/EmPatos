@@ -36,11 +36,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* TODO: Adicionar imagem */}
         <nav className="flex flex-col gap-4 p-4 mt-4">
-            <Link href="/" className="flex items-center justify-center text-lg gap-2"> {/* FIXME: Adicionar rota certa */}
+            <Link 
+              href="/" 
+              onClick={onClose}
+              className="flex items-center justify-center text-lg gap-2"
+            >
                 <i className="bi bi-person-plus text-2xl"></i>
                 Criar Conta
             </Link>
-            <Link href="/" className="flex items-center justify-center text-lg gap-2"> {/* FIXME: Adicionar rota certa */}
+            <Link 
+              href="/login" 
+              onClick={onClose}
+              className="flex items-center justify-center text-lg gap-2"
+            >
                 <i className="bi bi-box-arrow-in-right text-2xl"></i>
                 Entrar
             </Link>

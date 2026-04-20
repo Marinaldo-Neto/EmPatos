@@ -41,6 +41,7 @@ export default function HeaderHome () {
                     Em Patos
                 </Link>
                 <nav className='flex gap-2'>
+                
                     <button type="button" className='text-xl h-10 w-10'>
                         <i className='bi bi-search'></i>
                     </button>
