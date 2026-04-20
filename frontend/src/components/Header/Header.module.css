@@ -1,0 +1,19 @@
+
+.header {
+    display: flex;
+    padding: 8px 16px;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: 100%;
+    height: fit-content;
+    background-color: var(--component-bg);
+    color: var(--primary-text);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header button {
+    cursor: pointer;
+}
