@@ -4,15 +4,15 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from apps.providers.models import Category, ProviderProfile, Contact, WorkPhoto
 
 from apps.providers.api.v1.serializers import (
     CategorySerializer,
+    ContactSerializer,
     ProviderProfileReadSerializer,
     ProviderProfileWriteSerializer,
-    ContactSerializer,
     WorkPhotoSerializer,
 )
+from apps.providers.models import Category, Contact, ProviderProfile, WorkPhoto
 from apps.providers.permissions import IsProviderOwnerOrReadOnly, IsProviderResourceOwner
 
 
@@ -30,6 +30,16 @@ class ProviderProfileViewSet(viewsets.ModelViewSet):
     )
     permission_classes = [IsProviderOwnerOrReadOnly]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if self.action == "list" and not (
+            self.request.user.is_authenticated and self.request.user.is_superuser
+        ):
+            return queryset.filter(is_available=True)
+
+        return queryset
+
     def get_serializer_class(self):
         if self.action in ["list", "retrieve", "me"]:
             return ProviderProfileReadSerializer
@@ -42,21 +52,17 @@ class ProviderProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get", "put", "patch"], permission_classes=[IsAuthenticated])
     def me(self, request):
-        if request.user.role != request.user.Role.PROVIDER:
-            raise ValidationError("Apenas prestadores possuem perfil profissional.")
-
         if not hasattr(request.user, "provider_info"):
             raise NotFound("Perfil profissional não encontrado.")
-        
+
         profile = request.user.provider_info
 
         if request.method == "GET":
-            serializer = ProviderProfileReadSerializer(request.user.provider_info)
+            serializer = ProviderProfileReadSerializer(profile)
             return Response(serializer.data)
-        
+
         partial = request.method == "PATCH"
         serializer = ProviderProfileWriteSerializer(profile, data=request.data, partial=partial)
-
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

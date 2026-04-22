@@ -1,6 +1,8 @@
 from django.db import models
 from apps.shared.models import BaseModel
 from  django.conf import settings
+from decimal import Decimal, ROUND_HALF_UP
+from django.db.models import Avg, Count
 
 
 class Category(BaseModel):
@@ -36,8 +38,35 @@ class ProviderProfile(BaseModel):
 
     categories = models.ManyToManyField(Category)
 
+    rating_avg = models.DecimalField(
+        max_digits=3, decimal_places=2, default=Decimal("0.00"),
+        verbose_name="Média de avaliações"
+    )
+
+    rating_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Quantidade de avaliações"
+    )
+
     def __str__(self):
         return f"Perfil de {self.user.name}" 
+    
+    def recalc_rating(self, *, save: bool = True) -> None:
+        
+        agg = self.reviews_received.aggregate(
+            avg=Avg("stars"),
+            count=Count("id"),
+        )
+        avg = agg["avg"] or 0
+        count = agg["count"] or 0
+
+        avg_decimal = Decimal(str(avg)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        self.rating_avg = avg_decimal
+        self.rating_count = count
+
+        if save:
+            self.save(update_fields=["rating_avg", "rating_count"])
 
 class Contact(BaseModel):
     class Opcoes(models.TextChoices):

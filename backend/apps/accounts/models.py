@@ -1,24 +1,16 @@
-import uuid
-
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings
+
 from apps.shared.models import BaseModel
 
 from .managers import UserManager
-class User(AbstractUser, BaseModel):
-    class Role(models.TextChoices):
-        PROVIDER = "PROVIDER", "Prestador"
-        CLIENT = "CLIENT", "Cliente"
 
+
+class User(AbstractUser, BaseModel):
     username = None
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
-    role = models.CharField(
-        max_length=20,
-        choices=Role.choices,
-        default=Role.CLIENT,
-    )
 
     objects = UserManager()
 
@@ -42,10 +34,10 @@ class ClientProfile(BaseModel):
     )
 
     phone_number = models.CharField(
-        max_length=20, 
+        max_length=20,
         blank=True,
-        default = "",
-        verbose_name="WhatsApp/Telefone"
+        default="",
+        verbose_name="WhatsApp/Telefone",
     )
 
     def __str__(self):

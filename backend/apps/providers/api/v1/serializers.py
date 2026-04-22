@@ -37,6 +37,8 @@ class ProviderProfileReadSerializer(serializers.ModelSerializer):
             "categories",
             "contacts",
             "photos",
+            "rating_avg",
+            "rating_count",
             "created_at",
             "updated_at",
         ]
