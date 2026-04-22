@@ -5,10 +5,13 @@ from django.db import transaction
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError("O e-mail é obrigatório.")
+            raise ValueError("O e-mail e obrigatorio.")
 
         if not password:
-            raise ValueError("A senha é obrigatória.")
+            raise ValueError("A senha e obrigatoria.")
+
+        if len(password) < 8:
+            raise ValueError("A senha deve ter pelo menos 8 caracteres.")
 
         email = self.normalize_email(email)
 

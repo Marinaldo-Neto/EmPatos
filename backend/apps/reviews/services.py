@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
 from rest_framework.exceptions import ValidationError
 
@@ -14,20 +15,24 @@ def create_review(*, client, provider: ProviderProfile, stars: int, comment: str
     provider_locked = _lock_provider(provider.id)
 
     if provider_locked.user_id == client.id:
-        raise ValidationError({"provider": "Você não pode avaliar a si mesmo."})
+        raise ValidationError({"provider": "Voce nao pode avaliar a si mesmo."})
 
     if Review.objects.filter(provider_id=provider_locked.id, client_id=client.id).exists():
-        raise ValidationError("Você já avaliou este prestador.")
+        raise ValidationError("Voce ja avaliou este prestador.")
 
     try:
-        review = Review.objects.create(
+        review = Review(
             client=client,
             provider=provider_locked,
             stars=stars,
             comment=comment,
         )
+        review.full_clean()
+        review.save()
     except IntegrityError:
-        raise ValidationError("Você já avaliou este prestador.")
+        raise ValidationError("Voce ja avaliou este prestador.")
+    except DjangoValidationError as exc:
+        raise ValidationError(exc.message_dict)
 
     provider_locked.recalc_rating()
     return review
@@ -39,7 +44,12 @@ def update_review(*, review: Review, stars: int, comment: str = "") -> Review:
 
     review.stars = stars
     review.comment = comment
-    review.save(update_fields=["stars", "comment", "updated_at"])
+
+    try:
+        review.full_clean()
+        review.save(update_fields=["stars", "comment", "updated_at"])
+    except DjangoValidationError as exc:
+        raise ValidationError(exc.message_dict)
 
     provider_locked.recalc_rating()
     return review
