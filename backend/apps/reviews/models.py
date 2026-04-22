@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from apps.providers.models import ProviderProfile
 from apps.shared.models import BaseModel
+from django.db.models import Q
 
 class Review(BaseModel):
     client = models.ForeignKey(
@@ -31,6 +32,7 @@ class Review(BaseModel):
         constraints = [
             models.UniqueConstraint(
                 fields=["provider", "client"],
+                condition=Q(is_deleted=False),
                 name="unique_review_per_client",
             )
         ]

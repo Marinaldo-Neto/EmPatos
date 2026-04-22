@@ -1,8 +1,10 @@
 from rest_framework import viewsets
-from apps.reviews.models import Review
+
+from apps.reviews import services
 from apps.reviews.api.v1.serializers import ReviewSerializer
+from apps.reviews.models import Review
 from apps.reviews.permissions import IsReviewOwnerOrReadOnly
-from rest_framework.exceptions import ValidationError
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.select_related("client", "provider", "provider__user")
@@ -19,7 +21,30 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        if self.request.user.role != self.request.user.Role.CLIENT:
-            raise ValidationError("Apenas clientes podem criar avaliações.")
+        provider = serializer.validated_data["provider"]
+        stars = serializer.validated_data["stars"]
+        comment = serializer.validated_data.get("comment", "")
 
-        serializer.save(client=self.request.user)
+        review = services.create_review(
+            client=self.request.user,
+            provider=provider,
+            stars=stars,
+            comment=comment,
+        )
+        serializer.instance = review
+
+    def perform_update(self, serializer):
+        review = self.get_object()
+
+        stars = serializer.validated_data.get("stars", review.stars)
+        comment = serializer.validated_data.get("comment", review.comment)
+
+        updated = services.update_review(
+            review=review,
+            stars=stars,
+            comment=comment,
+        )
+        serializer.instance = updated
+
+    def perform_destroy(self, instance):
+        services.delete_review(review=instance)
