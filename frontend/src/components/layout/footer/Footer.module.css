@@ -1,0 +1,20 @@
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 16px;
+    gap: 16px;
+    width: 100%;
+    height: fit-content;
+    text-align: center;
+    background-color: var(--component-bg);
+    color: var(--primary-text);
+}
+
+.footer p, .footer ul, .footer span {
+    color: var(--secondary-text);
+}
+
+.footer hr {
+    color: var(--border-color);
+}
