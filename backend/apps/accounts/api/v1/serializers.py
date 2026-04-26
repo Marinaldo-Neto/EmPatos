@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from apps.accounts.models import ClientProfile
 from apps.providers.models import ProviderProfile
+from apps.shared.validators import normalize_brazilian_phone
 
 User = get_user_model()
 
@@ -54,6 +55,12 @@ class ClientProfileSerializer(serializers.ModelSerializer):
         required=False,
     )
     user = UserPublicSerializer(read_only=True)
+
+    def validate_phone_number(self, value):
+        if not value:
+            return ""
+
+        return normalize_brazilian_phone(value, field_label="phone_number")
 
     class Meta:
         model = ClientProfile

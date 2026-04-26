@@ -3,10 +3,21 @@ from apps.shared.models import BaseModel
 from  django.conf import settings
 from decimal import Decimal, ROUND_HALF_UP
 from django.db.models import Avg, Count
+from django.db.models import Q
+from django.core.exceptions import ValidationError
+
+from apps.shared.validators import normalize_provider_contact
 
 
 class Category(BaseModel):
     name = models.CharField(max_length=255, unique=True, verbose_name="Nome da Categoria")
+
+    def clean(self):
+        super().clean()
+        self.name = self.name.strip()
+
+        if not self.name:
+            raise ValidationError({"name": "Informe o nome da categoria."})
     
     def __str__(self):
         return self.name
@@ -86,6 +97,19 @@ class Contact(BaseModel):
         on_delete=models.CASCADE, 
         related_name="contacts"
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["provider", "platform", "value"],
+                condition=Q(is_deleted=False),
+                name="unique_active_contact_per_provider",
+            )
+        ]
+
+    def clean(self):
+        super().clean()
+        self.value = normalize_provider_contact(self.platform, self.value)
 
     def __str__(self):
         return f"{self.platform} - {self.value}" 
