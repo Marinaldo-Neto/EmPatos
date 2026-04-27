@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, ValidationError
+from django.db.models import Q
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -21,24 +22,64 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get("search", "").strip()
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
+        return queryset
+
 
 class ProviderProfileViewSet(viewsets.ModelViewSet):
-    queryset = ProviderProfile.objects.select_related("user").prefetch_related(
-        "categories",
-        "contacts",
-        "photos",
+    queryset = (
+        ProviderProfile.objects.select_related("user")
+        .prefetch_related("categories", "contacts", "photos")
+        .order_by("user__name")
     )
     permission_classes = [IsProviderOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        search = self.request.query_params.get("search", "").strip()
+        category_ids = []
+
+        for raw_value in self.request.query_params.getlist("category"):
+            category_ids.extend(
+                [value.strip() for value in raw_value.split(",") if value.strip()]
+            )
+            
+        category_name = self.request.query_params.get("category_name", "").strip()
+        ordering = self.request.query_params.get("ordering", "").strip()
 
         if self.action == "list" and not (
             self.request.user.is_authenticated and self.request.user.is_superuser
         ):
-            return queryset.filter(is_available=True)
+            queryset = queryset.filter(is_available=True)
 
-        return queryset
+        if category_ids:
+            queryset = queryset.filter(categories__id__in=category_ids)
+
+        if category_name:
+            queryset = queryset.filter(categories__name__icontains=category_name)
+
+        if search:
+            queryset = queryset.filter(
+                Q(user__name__icontains=search)
+                | Q(bio__icontains=search)
+                | Q(description__icontains=search)
+                | Q(categories__name__icontains=search)
+            )
+
+        if ordering == "rating":
+            queryset = queryset.order_by("-rating_avg", "-rating_count", "user__name")
+        elif ordering == "recent":
+            queryset = queryset.order_by("-created_at")
+        elif ordering == "name":
+            queryset = queryset.order_by("user__name")
+
+        return queryset.distinct()
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve", "me"]:
