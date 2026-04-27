@@ -1,5 +1,10 @@
+"use client";
+
 import styles from "./Sidebar.module.css";
-import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import GuestSidebarContent from "@/components/layout/sidebar/GuestSidebarContent";
+import ClientSidebarContent from "@/components/layout/sidebar/ClientSidebarContent";
+import ProviderSidebarContent from "@/components/layout/sidebar/ProviderClientContent";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -7,6 +12,8 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { isAuthenticated, accountType } = useAuth();
+
   return (
     <>
       {isOpen && (
@@ -17,34 +24,33 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           className="fixed inset-0 z-40 bg-black/50"
         />
       )}
-      
+
       <aside
         id="mobile-sidebar"
         className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}
+        aria-hidden={!isOpen}
       >
         <div className="flex items-center justify-between border-b px-4 py-2">
-          <span className="text-xl font-bold">Menu</span>
+          <span className="text-xl">Menu</span>
           <button
             type="button"
             onClick={onClose}
             aria-label="Fechar menu"
-            className="text-xl h-10 w-10"
+            className="h-10 w-10 text-xl"
           >
-            <i className="bi bi-x-lg"></i>
+            <i className="bi bi-x-lg" />
           </button>
         </div>
 
-        {/* TODO: Adicionar imagem */}
-        <nav className="flex flex-col gap-4 p-4 mt-4">
-            <Link href="/" className="flex items-center justify-center text-lg gap-2"> {/* FIXME: Adicionar rota certa */}
-                <i className="bi bi-person-plus text-2xl"></i>
-                Criar Conta
-            </Link>
-            <Link href="/" className="flex items-center justify-center text-lg gap-2"> {/* FIXME: Adicionar rota certa */}
-                <i className="bi bi-box-arrow-in-right text-2xl"></i>
-                Entrar
-            </Link>
-        </nav>
+        {!isAuthenticated && <GuestSidebarContent onClose={onClose} />}
+
+        {isAuthenticated && accountType === "client" && (
+          <ClientSidebarContent onClose={onClose} />
+        )}
+
+        {isAuthenticated && accountType === "provider" && (
+          <ProviderSidebarContent onClose={onClose} />
+        )}
       </aside>
     </>
   );

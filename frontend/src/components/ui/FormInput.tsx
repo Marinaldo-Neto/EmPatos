@@ -44,12 +44,12 @@ export default function FormInput({
           onChange={(e) => onChange(e.target.value)}
           className={`
             w-full rounded-lg border-2 border-(--border-color)
-            bg-var(--component-bg)
+            bg-(--component-bg)
             text-(--secondary-text)
             p-2
             outline-none
             transition
-            focus:border-var(--primary-color)
+            focus:border-(--primary-color)
             ${className}
           `}
         />

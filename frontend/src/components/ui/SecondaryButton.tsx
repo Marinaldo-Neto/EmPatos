@@ -6,7 +6,7 @@ type ButtonLinkProps = {
   className?: string;
 };
 
-export default function PrimaryButton({
+export default function SecondaryButton({
   children,
   href,
   className="",
@@ -18,11 +18,13 @@ export default function PrimaryButton({
         w-full
         h-fit
         cursor-pointer
-        bg-(--primary-color)
+        bg-(--component-bg)
+        border-2
+        border-(--border-color)
         rounded-lg
         text-center
-        text-(--button-item)
-        font-bold
+        text-(--secondary-color)
+        font-semibold
         active:brightness-90
         ${className}
         `}
