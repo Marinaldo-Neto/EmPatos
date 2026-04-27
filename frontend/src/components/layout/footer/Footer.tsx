@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer () {
     return (
-        <footer className={styles.footer}> {/* FIXME: Alterar o flex-col e padding no @media */}
+        <footer className={styles.footer}>
             <article className="flex flex-col w-full gap-4 md:flex-row">
                 <div className="flex flex-1 flex-col items-center gap-2">
                   <Link href="/" className="flex items-center text-lg font-bold gap-2">
@@ -25,7 +25,7 @@ export default function Footer () {
                 </div>
                 <div className="flex flex-1 flex-col gap-2">
                   <h4 className="text-sm font-bold">PARA CLIENTES</h4>
-                  <ul className="text-sm">
+                  <ul className="flex flex-col gap-1 text-sm">
                       <li>
                           <Link href="/">Como funciona?</Link> {/* FIXME: Adicionar link funcional*/}
                       </li>
@@ -39,7 +39,7 @@ export default function Footer () {
                 </div>
                 <div className="flex flex-1 flex-col gap-2">
                   <h4 className="text-sm font-bold">PARA PROFISSIONAIS</h4>
-                  <ul className="text-sm">
+                  <ul className="flex flex-col gap-1 text-sm">
                       <li>
                           <Link href="/">Anuncie seus serviços</Link> {/* FIXME: Adicionar link funcional*/}
                       </li>
@@ -53,7 +53,7 @@ export default function Footer () {
                 </div>
                 <div className="flex flex-1 flex-col gap-2">
                   <h4 className="text-sm font-bold">INSTITUCIONAL</h4>
-                  <ul className="text-sm">
+                  <ul className="flex flex-col gap-1 text-sm">
                       <li>
                           <Link href="/">Sobre nós</Link> {/* FIXME: Adicionar link funcional*/}
                       </li>

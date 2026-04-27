@@ -23,7 +23,7 @@ export default function FormButton({
         text-(--button-item)
         font-bold
         text-base
-        active:grayscale-25
+        active:brightness-90
         ${className}
       `}
     >
